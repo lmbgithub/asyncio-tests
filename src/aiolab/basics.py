@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Any, Awaitable, Callable, Iterable, Sequence, TypeVar
+from collections.abc import Awaitable, Callable, Iterable, Sequence
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 
@@ -75,7 +76,11 @@ def is_awaited_correctly(obj: Any) -> bool:
     used in 'await' expression`, which reads as a typing problem rather than
     the missing `()` it actually is.
     """
-    return asyncio.iscoroutine(obj) or isinstance(obj, asyncio.Future) or hasattr(obj, "__await__")
+    return (
+        asyncio.iscoroutine(obj)
+        or isinstance(obj, asyncio.Future)
+        or hasattr(obj, "__await__")
+    )
 
 
 async def consume(iterable: Iterable[Awaitable[T]]) -> list[T]:

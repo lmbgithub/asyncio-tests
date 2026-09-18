@@ -30,8 +30,9 @@ from __future__ import annotations
 
 import asyncio
 import random
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Awaitable, Callable, TypeVar
+from typing import TypeVar
 
 from .errors import RetryError
 
@@ -108,7 +109,7 @@ async def retry(
         except asyncio.CancelledError:
             # Never retried, never wrapped, never counted as a failure.
             raise
-        except BaseException as exc:  # noqa: BLE001 - narrowed by the predicate below
+        except BaseException as exc:
             if not retry_on(exc):
                 raise
             last = exc
@@ -156,7 +157,9 @@ async def retry_with_timeout(
     return await retry(
         attempt,
         policy,
-        retry_on=lambda exc: isinstance(exc, asyncio.TimeoutError) or default_retryable(exc),
+        retry_on=lambda exc: (
+            isinstance(exc, asyncio.TimeoutError) or default_retryable(exc)
+        ),
         sleep=sleep,
         rand=rand,
     )
@@ -184,7 +187,7 @@ class CircuitBreaker:
         *,
         threshold: int = 3,
         reset_after: float = 1.0,
-        clock: Callable[[], float] = None,  # type: ignore[assignment]
+        clock: Callable[[], float] | None = None,
     ) -> None:
         if threshold < 1:
             raise ValueError("threshold must be >= 1")

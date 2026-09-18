@@ -21,7 +21,8 @@ keeps output order while doing so.
 from __future__ import annotations
 
 import asyncio
-from typing import AsyncIterator, Awaitable, Callable, Iterable, TypeVar
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable
+from typing import TypeVar
 
 T = TypeVar("T")
 R = TypeVar("R")

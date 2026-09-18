@@ -17,13 +17,13 @@ async def test_timed_reports_a_positive_duration():
 
 
 async def test_sequential_takes_the_sum():
-    factories = [(lambda: basics.delay(i, 0.02)) for i in range(3)]
+    factories = [(lambda i=i: basics.delay(i, 0.02)) for i in range(3)]
     _, elapsed = await basics.timed(basics.run_sequential(factories))
     assert elapsed >= 0.055
 
 
 async def test_concurrent_takes_the_max():
-    factories = [(lambda: basics.delay(i, 0.02)) for i in range(3)]
+    factories = [(lambda i=i: basics.delay(i, 0.02)) for i in range(3)]
     _, elapsed = await basics.timed(basics.run_concurrent(factories))
     assert elapsed < 0.05
 

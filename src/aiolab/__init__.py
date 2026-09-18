@@ -14,25 +14,8 @@ what does the obvious version of this get wrong?
 
 from __future__ import annotations
 
-from .errors import AiolabError, ConcurrencyError, PoolClosedError, RetryError
 from .basics import delay, run_concurrent, run_sequential, timed, to_thread
-from .tasks import (
-    TaskRegistry,
-    cancel_and_wait,
-    first_result,
-    run_all,
-    run_all_settled,
-)
-from .sync import (
-    Once,
-    RaceyCounter,
-    ReadWriteLock,
-    ResourcePool,
-    SafeCounter,
-    TokenBucket,
-    wait_for_event,
-)
-from .queues import PoolStats, WorkerPool, batched, drain_now, produce
+from .errors import AiolabError, ConcurrencyError, PoolClosedError, RetryError
 from .futures import (
     CallbackBridge,
     as_completed_results,
@@ -42,7 +25,7 @@ from .futures import (
     shielded,
     wait_any,
 )
-from .streams import aiter_from, amap, collect, merge, take_until, throttle
+from .queues import PoolStats, WorkerPool, batched, drain_now, produce
 from .retry import (
     CircuitBreaker,
     RetryPolicy,
@@ -51,53 +34,70 @@ from .retry import (
     retry_with_timeout,
     with_timeout,
 )
+from .streams import aiter_from, amap, collect, merge, take_until, throttle
+from .sync import (
+    Once,
+    RaceyCounter,
+    ReadWriteLock,
+    ResourcePool,
+    SafeCounter,
+    TokenBucket,
+    wait_for_event,
+)
+from .tasks import (
+    TaskRegistry,
+    cancel_and_wait,
+    first_result,
+    run_all,
+    run_all_settled,
+)
 
 __version__ = "0.1.0"
 
 __all__ = [
     "AiolabError",
+    "CallbackBridge",
+    "CircuitBreaker",
     "ConcurrencyError",
-    "PoolClosedError",
-    "RetryError",
-    "delay",
-    "timed",
-    "to_thread",
-    "run_sequential",
-    "run_concurrent",
-    "TaskRegistry",
-    "cancel_and_wait",
-    "first_result",
-    "run_all",
-    "run_all_settled",
     "Once",
+    "PoolClosedError",
+    "PoolStats",
     "RaceyCounter",
-    "SafeCounter",
     "ReadWriteLock",
     "ResourcePool",
+    "RetryError",
+    "RetryPolicy",
+    "SafeCounter",
+    "TaskRegistry",
     "TokenBucket",
-    "wait_for_event",
-    "PoolStats",
     "WorkerPool",
-    "batched",
-    "drain_now",
-    "produce",
-    "CallbackBridge",
-    "as_completed_results",
-    "gather_with_index",
-    "make_future",
-    "settle",
-    "shielded",
-    "wait_any",
     "aiter_from",
     "amap",
+    "as_completed_results",
+    "batched",
+    "cancel_and_wait",
     "collect",
-    "merge",
-    "take_until",
-    "throttle",
-    "CircuitBreaker",
-    "RetryPolicy",
     "default_retryable",
+    "delay",
+    "drain_now",
+    "first_result",
+    "gather_with_index",
+    "make_future",
+    "merge",
+    "produce",
     "retry",
     "retry_with_timeout",
+    "run_all",
+    "run_all_settled",
+    "run_concurrent",
+    "run_sequential",
+    "settle",
+    "shielded",
+    "take_until",
+    "throttle",
+    "timed",
+    "to_thread",
+    "wait_any",
+    "wait_for_event",
     "with_timeout",
 ]

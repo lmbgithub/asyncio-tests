@@ -10,7 +10,7 @@ import argparse
 import asyncio
 import sys
 import time
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
 
 from . import basics, streams
 from .errors import ConcurrencyError

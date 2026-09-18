@@ -22,7 +22,8 @@ The rules that matter:
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Awaitable, Callable, Iterable, TypeVar
+from collections.abc import Awaitable, Callable, Iterable
+from typing import TypeVar
 
 from .errors import ConcurrencyError
 
@@ -34,7 +35,9 @@ def make_future(loop: asyncio.AbstractEventLoop | None = None) -> asyncio.Future
     return (loop or asyncio.get_running_loop()).create_future()
 
 
-def settle(future: asyncio.Future, result: T | None = None, error: BaseException | None = None) -> bool:
+def settle(
+    future: asyncio.Future, result: T | None = None, error: BaseException | None = None
+) -> bool:
     """Resolve a future, returning False if it was already done.
 
     Idempotent by design. A timeout path and a completion callback racing to
@@ -87,7 +90,7 @@ class CallbackBridge:
 
 
 async def as_completed_results(
-    factories: Iterable[Callable[[], Awaitable[T]]]
+    factories: Iterable[Callable[[], Awaitable[T]]],
 ) -> list[tuple[int, T | BaseException]]:
     """Yield `(input_index, outcome)` in *completion* order.
 
@@ -105,7 +108,9 @@ async def as_completed_results(
     pending = set(tasks)
     try:
         while pending:
-            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+            done, pending = await asyncio.wait(
+                pending, return_when=asyncio.FIRST_COMPLETED
+            )
             for task in done:
                 exc = task.exception()
                 out.append((tasks[task], exc if exc is not None else task.result()))
@@ -117,7 +122,9 @@ async def as_completed_results(
     return out
 
 
-async def wait_any(futures: Iterable[asyncio.Future], *, timeout: float | None = None) -> asyncio.Future:
+async def wait_any(
+    futures: Iterable[asyncio.Future], *, timeout: float | None = None
+) -> asyncio.Future:
     """Return the first future to settle; leave the rest alone.
 
     Deliberately does *not* cancel the losers — the caller may still want them.
@@ -127,15 +134,15 @@ async def wait_any(futures: Iterable[asyncio.Future], *, timeout: float | None =
     pending = set(futures)
     if not pending:
         raise ValueError("wait_any requires at least one future")
-    done, _ = await asyncio.wait(pending, timeout=timeout, return_when=asyncio.FIRST_COMPLETED)
+    done, _ = await asyncio.wait(
+        pending, timeout=timeout, return_when=asyncio.FIRST_COMPLETED
+    )
     if not done:
         raise asyncio.TimeoutError(f"no future settled within {timeout}s")
     return next(iter(done))
 
 
-async def gather_with_index(
-    factories: Iterable[Callable[[], Awaitable[T]]]
-) -> list[T]:
+async def gather_with_index(factories: Iterable[Callable[[], Awaitable[T]]]) -> list[T]:
     """`gather` with the failure aggregated instead of first-wins.
 
     `gather` raises the first exception and discards the rest. When a batch of
@@ -145,7 +152,9 @@ async def gather_with_index(
     """
     tasks = [asyncio.ensure_future(f()) for f in factories]
     await asyncio.gather(*tasks, return_exceptions=True)
-    failures = [t.exception() for t in tasks if not t.cancelled() and t.exception() is not None]
+    failures = [
+        t.exception() for t in tasks if not t.cancelled() and t.exception() is not None
+    ]
     if failures:
         raise ConcurrencyError([f for f in failures if f is not None])
     return [t.result() for t in tasks]

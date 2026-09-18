@@ -22,7 +22,8 @@ Three decisions live in this module.
 from __future__ import annotations
 
 import asyncio
-from typing import Awaitable, Callable, Sequence, TypeVar
+from collections.abc import Awaitable, Callable, Sequence
+from typing import TypeVar
 
 from .errors import ConcurrencyError
 
@@ -54,7 +55,9 @@ async def cancel_and_wait(tasks: Sequence[asyncio.Task]) -> None:
             pass
 
 
-async def run_all(factories: Sequence[Factory[T]], *, limit: int | None = None) -> list[T]:
+async def run_all(
+    factories: Sequence[Factory[T]], *, limit: int | None = None
+) -> list[T]:
     """Run everything concurrently; results in input order; all-or-nothing.
 
     On the first failure the remaining children are cancelled and awaited, then
@@ -136,7 +139,9 @@ async def first_result(factories: Sequence[Factory[T]]) -> T:
     pending = set(tasks)
     try:
         while pending:
-            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+            done, pending = await asyncio.wait(
+                pending, return_when=asyncio.FIRST_COMPLETED
+            )
             for task in done:
                 exc = task.exception()
                 if exc is None:
@@ -217,7 +222,7 @@ class TaskRegistry:
         self._closed = True
         await cancel_and_wait(list(self._tasks))
 
-    async def __aenter__(self) -> "TaskRegistry":
+    async def __aenter__(self) -> TaskRegistry:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

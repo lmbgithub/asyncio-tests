@@ -17,7 +17,8 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Awaitable, Callable, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -124,7 +125,7 @@ class ResourcePool:
         self._in_use -= 1
         self._free.put_nowait(resource)
 
-    def borrow(self) -> "_Borrow[T]":
+    def borrow(self) -> _Borrow[T]:
         """`async with pool.borrow() as conn:` — release is guaranteed."""
         return _Borrow(self)
 
@@ -203,7 +204,8 @@ class TokenBucket:
         """Wait until `amount` tokens are available. Returns seconds waited."""
         if amount > self.capacity:
             raise ValueError(
-                f"cannot acquire {amount} tokens from a bucket of capacity {self.capacity}"
+                f"cannot acquire {amount} tokens from a bucket of "
+                f"capacity {self.capacity}"
             )
         waited = 0.0
         async with self._lock:
@@ -270,10 +272,10 @@ class ReadWriteLock:
             self._writer = False
             self._condition.notify_all()
 
-    def read(self) -> "_RWContext":
+    def read(self) -> _RWContext:
         return _RWContext(self, write=False)
 
-    def write(self) -> "_RWContext":
+    def write(self) -> _RWContext:
         return _RWContext(self, write=True)
 
 
@@ -282,7 +284,7 @@ class _RWContext:
         self._lock = lock
         self._write = write
 
-    async def __aenter__(self) -> "ReadWriteLock":
+    async def __aenter__(self) -> ReadWriteLock:
         if self._write:
             await self._lock.acquire_write()
         else:

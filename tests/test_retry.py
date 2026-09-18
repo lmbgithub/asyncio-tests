@@ -51,8 +51,18 @@ async def test_retries_until_it_succeeds():
 
 
 async def test_backoff_is_exponential_and_capped():
-    policy = RetryPolicy(attempts=8, base_delay=1.0, factor=2.0, max_delay=8.0, jitter=False)
-    assert [policy.delay_for(i) for i in range(1, 8)] == [0.0, 1.0, 2.0, 4.0, 8.0, 8.0, 8.0]
+    policy = RetryPolicy(
+        attempts=8, base_delay=1.0, factor=2.0, max_delay=8.0, jitter=False
+    )
+    assert [policy.delay_for(i) for i in range(1, 8)] == [
+        0.0,
+        1.0,
+        2.0,
+        4.0,
+        8.0,
+        8.0,
+        8.0,
+    ]
 
 
 async def test_full_jitter_stays_within_the_backoff_window():

@@ -68,7 +68,9 @@ async def test_amap_unordered_yields_the_fast_item_first():
         await asyncio.sleep(0.001 if n == 2 else 0.03)
         return n
 
-    out = await collect(amap(aiter_from([0, 1, 2]), variable, concurrency=3, ordered=False))
+    out = await collect(
+        amap(aiter_from([0, 1, 2]), variable, concurrency=3, ordered=False)
+    )
     assert out[0] == 2
     assert sorted(out) == [0, 1, 2]
 
@@ -156,8 +158,9 @@ async def test_take_until_stops_at_an_item_boundary():
         await asyncio.sleep(0.03)
         event.set()
 
-    asyncio.ensure_future(stopper())
+    stopping = asyncio.ensure_future(stopper())
     out = await collect(take_until(ticker(), event))
+    await stopping
     assert out == list(range(len(out)))
     assert 1 <= len(out) <= 8
 

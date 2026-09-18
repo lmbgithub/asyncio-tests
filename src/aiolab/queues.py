@@ -21,8 +21,9 @@ wrong:
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Any, Awaitable, Callable, AsyncIterator, Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from .errors import PoolClosedError
 
@@ -69,7 +70,9 @@ class WorkerPool(Generic[T, R]):
         if workers < 1:
             raise ValueError("workers must be >= 1")
         if maxsize < 1:
-            raise ValueError("maxsize must be >= 1; an unbounded queue has no backpressure")
+            raise ValueError(
+                "maxsize must be >= 1; an unbounded queue has no backpressure"
+            )
         self._handler = handler
         self._queue: asyncio.Queue = asyncio.Queue(maxsize=maxsize)
         self._workers: list[asyncio.Task] = []
@@ -87,7 +90,7 @@ class WorkerPool(Generic[T, R]):
     def backlog(self) -> int:
         return self._queue.qsize()
 
-    async def start(self) -> "WorkerPool[T, R]":
+    async def start(self) -> WorkerPool[T, R]:
         if self._workers:
             raise RuntimeError("pool already started")
         self._workers = [
@@ -156,7 +159,7 @@ class WorkerPool(Generic[T, R]):
         self._workers = []
         return self.stats
 
-    async def __aenter__(self) -> "WorkerPool[T, R]":
+    async def __aenter__(self) -> WorkerPool[T, R]:
         return await self.start()
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

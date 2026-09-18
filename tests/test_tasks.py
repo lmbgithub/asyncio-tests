@@ -20,7 +20,9 @@ async def boom(message: str = "boom", after: float = 0.0):
 
 
 async def test_run_all_returns_results_in_input_order():
-    factories = [(lambda i=i, d=d: basics.delay(i, d)) for i, d in enumerate([0.02, 0.0, 0.01])]
+    factories = [
+        (lambda i=i, d=d: basics.delay(i, d)) for i, d in enumerate([0.02, 0.0, 0.01])
+    ]
     assert await run_all(factories) == [0, 1, 2]
 
 
@@ -47,9 +49,7 @@ async def test_run_all_does_not_wait_for_the_slow_siblings():
     async def slow():
         await asyncio.sleep(10)
 
-    _, elapsed = await basics.timed(
-        _expect_failure([slow, lambda: boom(after=0.01)])
-    )
+    _, elapsed = await basics.timed(_expect_failure([slow, lambda: boom(after=0.01)]))
     assert elapsed < 1.0
 
 
@@ -147,7 +147,10 @@ async def test_first_result_cancels_the_losers():
 
 
 async def test_first_result_ignores_an_early_failure():
-    assert await first_result([lambda: boom("early"), lambda: basics.delay("ok", 0.02)]) == "ok"
+    assert (
+        await first_result([lambda: boom("early"), lambda: basics.delay("ok", 0.02)])
+        == "ok"
+    )
 
 
 async def test_first_result_raises_when_everything_fails():
