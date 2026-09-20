@@ -1,15 +1,14 @@
 # aiolab
 
-asyncio from `async def` to structured concurrency, in seven levels. Python
-standard library only, no dependencies, **150 tests**, all under
+A hands-on tour of asyncio, from `async def` to structured concurrency, in seven
+levels. Python standard library only, **150 tests**, all running under
 `pytest-asyncio` auto mode.
 
-The subject is not hard to demonstrate — every tutorial can show you
-`await asyncio.sleep(1)` twice and call it concurrency. What they skip is that
-almost every asyncio bug in production comes from four things: a task nobody
-owns, a cancellation somebody swallowed, a queue with no bound, and a retry
-loop that does not know what `CancelledError` is. Each module here is organised
-around one of those.
+Most asyncio material stops at running two coroutines at once. The bugs that
+actually reach production come from four other places: a task nobody owns, a
+cancellation somebody swallowed, a queue with no bound, and a retry loop that
+does not handle `CancelledError`. Each module here is built around one of them,
+so the failure mode is visible and testable rather than described.
 
 ```
 $ aiolab tasks
